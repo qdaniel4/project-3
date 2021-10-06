@@ -1,24 +1,128 @@
 import sqlite3
+import random
 
 conn = sqlite3.connect('quiz_data_questions_db.db')
 
-def add_user():
-    #todo add users
+def add_user(first_name, last_name):
 
-def get_topic_by_id():
-    #todo get topic
+    insert_string = 'insert into users (user_firstname, user_lastname) values (?, ?)'
 
-def get_questions():
-    #todo get questions
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            res = con.execute(insert_string, (first_name, last_name) )
+    except sqlite3.IntegrityError as e:
+        print(f'Error adding user because of {e}\n')
+    finally:
+        con.close()
 
-def get_choices():
-    #todo get multiple choices for questions
 
-def get_points_for_question():
-    #todo get question points
 
-def get_difficulty():
-    #todo get question difficulty
+def get_topic_by_id(topic_num):
+
+    select_string = 'select topic_name from topics where topic_id == ?'
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            topic_name = con.execute(select_string, topic_num)
+    except sqlite3.IntegrityError as e:
+        print(f'Error fetching topic because of {e}\n')
+    finally:
+        con.close()
+    return topic_name
+
+
+def get_question_ids(topic_num):
+
+    select_string = 'select question_id from questions where topic_id == ?'
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            question_ids = con.execute(select_string, topic_num)
+    except sqlite3.IntegrityError as e:
+        print(f'Error fetching question ID because of {e}\n')
+    finally:
+        con.close()
+    return question_ids
+
+def get_question_text(question_ids):
+
+    select_string = 'select question_text from questions where question_id == ?'
+    q_text_list = []
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            for q_text in range(len(question_ids)):
+                question_text = con.execute(select_string, question_ids[q_text])
+                q_text_list.append(question_text)
+    except sqlite3.IntegrityError as e:
+        print(f'Error fetching question text because of {e}\n')
+    finally:
+        con.close()
+    return q_text_list
+
+def get_points_for_question(question_ids):
+
+    select_string = 'select points from questions where question_id == ?'
+    q_point_list = []
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            for points in range(len(question_ids)):
+                q_points = con.execute(select_string, question_ids[points])
+                q_point_list.append(q_points)
+    except sqlite3.IntegrityError as e:
+        print(f'Error fetching question points because of {e}\n')
+    finally:
+        con.close()
+    return q_point_list
+
+def get_difficulty(question_ids):
+
+    select_string = 'select difficulty from questions where question_id == ?'
+    q_diff_list = []
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            for diff in range(len(question_ids)):
+                q_diff = con.execute(select_string, question_ids[diff])
+                q_diff_list.append(q_diff)
+    except sqlite3.IntegrityError as e:
+        print(f'Error fetching question difficulty because of {e}\n')
+    finally:
+        con.close()
+    return q_diff_list
+
+def get_choices(question_ids):
+
+    select_string = 'select correct_answer, wrong_answer1, wrong_answer2, wrong_answer3 from choices where choice_id = ?'
+    choice_list = []
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            for choice in range(len(question_ids)):
+                choices = con.execute(select_string, question_ids[choice])
+                choice_list.append(choices)
+    except sqlite3.IntegrityError as e:
+        print(f'Error fetching question choices because of {e}\n')
+    finally:
+        con.close()
+    return choice_list
+
+def get_answer(question_ids):
+
+    check_answer = 'select correct_answer from choices where choice_id == ?'
+    answer_list = []
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            for answer in range(len(question_ids)):
+                correct_answer = con.execute(check_answer, question_ids[answer])
+                answer_list.append(correct_answer)
+    except sqlite3.IntegrityError as e:
+        print(f'Error fetching correct answers because of {e}\n')
+    finally:
+        con.close()
+    return answer_list
 
 def get_session_info():
-    #todo get session info
+    print()

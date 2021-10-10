@@ -114,23 +114,6 @@ def get_choices(question_ids):
         con.close()
     return choice_list
 
-def get_answer(question_ids):
-
-    check_answer = 'select correct_answer from choices where choice_id == ?'
-    answer_list = []
-
-    try:
-        with sqlite3.connect('quiz_data_questions_db.db') as con:
-            for answer in range(len(question_ids)):
-                res = con.execute(check_answer, question_ids[answer])
-                correct_answer = res.fetchone()
-                answer_list.append(correct_answer)
-    except sqlite3.IntegrityError as e:
-        print(f'Error fetching correct answers because of {e}\n')
-    finally:
-        con.close()
-    return answer_list
-
 def check_answer(question_id):
     select_correct = 'select correct_answer from choices where choice_id == ?'
 

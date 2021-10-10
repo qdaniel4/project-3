@@ -11,16 +11,19 @@ def main():
 
 
     print('Please enter your topic of choice by entering the corresponding number:')
-    topic = input('1: \n'
-                  '2: \n'
-                  '3: \n')
-    topic_num = validation.topic_and_answer_validation(topic)
+    topic = input('1: Sports\n'
+                  '2: Geography\n'
+                  '3: Food/Drink\n')
+    topic_num = validation.topic_validation(topic)
+    q_ids = get_q_ids(topic_num)
+
+    #print(a_list)
 
     print('Please enter the number of questions you would like to take by entering the corresponding number:')
     question_amount = input('1: 3 Questions \n'
                             '2: 5 Questions \n')
     question_amount_num = validation.question_num_validation(question_amount)
-
+    a_list = show_q_info(topic_num, q_ids)
 def get_q_ids(topic_num):
     question_ids = db_manager.get_question_ids(topic_num)
     return question_ids
@@ -39,30 +42,53 @@ def show_q_info(topic_num, question_ids):
     questions = db_manager.get_question_text(question_ids)
     choices = db_manager.get_choices(question_ids)
     topic_name, points, difficulty, correct_answers = get_q_info(topic_num, question_ids)
-    answer_list = []
+    result_list = []
 
     for question in range(len(questions)):
-        print(f'Topic: {topic_name}')
-        print(f'Points available: {points[question]}')
-        print(f'Difficulty: {difficulty[question]}')
-        print(questions[question])
-        counter = 0
+        print(f'Topic: {topic_name[0][0]}')
+        print(f'Points available: {points[question][0]}')
+        print(f'Difficulty: {difficulty[question][0]}')
+        print(questions[question][0])
+
+
         for choice in range(len(choices[question])):
             print(f'{choice + 1}: {choices[question][choice]}')
-        answer = input('Please enter answer')
-        answer_val = validation.topic_and_answer_validation(answer)
-        check_answers(answer, correct_answers)
-        counter = counter + answer_val
-        answer_list.append(choices[question][counter -1])
 
-    return answer_list
+        answer = input('Please enter answer: \n')
+        answer_val = validation.answer_validation(answer)
 
-def check_answers(user_answer, correct_answers):
-    for answer in range(len(correct_answers)):
-        if user_answer != correct_answers[answer]:
-            print(f'Incorrect\nThe correct answer was {correct_answers[answer]}')
-        else:
-            print('Correct!')
+        answer_str = choices[question][answer_val-1]
+        correct_ans = db_manager.check_answer(question_ids[question][0])
+        result = check_user_answer(answer_str, correct_ans)
+
+        score = points_added(result, points[question][0])
+        result_list.append(score)
+
+
+
+    return result_list
+
+def check_user_answer(user_ans, correct_ans):
+    if user_ans != correct_ans[0]:
+        print(f'\nIncorrect\n\nThe correct answer was {correct_ans[0]}\n\n')
+        return False
+    else:
+        print('\nCorrect!\n')
+        return True
+
+def points_added(result, points):
+    score = 0
+    if result:
+        score = score + points
+    else:
+        points = 0
+        score = score + points
+    return score
+
+
+
+
+
 
 
 

@@ -15,7 +15,19 @@ def add_user(first_name, last_name):
     finally:
         con.close()
 
+def get_user_id(first_name):
 
+    select_string = 'select user_id from users where first_name = ?'
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            res = con.execute(select_string, (first_name, ))
+            user_id = res.fetchone()
+    except sqlite3.IntegrityError as e:
+        print(f'Error adding user because of {e}\n')
+    finally:
+        con.close()
+    return user_id
 
 def get_topic_by_id(topic_num):
 
@@ -128,5 +140,57 @@ def check_answer(question_id):
         con.close()
     return correct_answer
 
-def get_session_info():
-    print()
+"""def add_session_info(user_id, choice_id, topic_id, question_id):
+
+    insert_string = 'insert into session (user_id, choice_id, topic_id, question_id) values (?, ?, ?, ?)'
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            con.execute(insert_string, (user_id, choice_id, topic_id, question_id))
+    except sqlite3.IntegrityError as e:
+        print(f'Error adding to session table because {e}\n')
+    finally:
+        con.close()"""
+
+"""def add_results(session_id, start, end, points, correct):
+    
+    insert_string_one = 'insert into results (points, correct, time_started, time_ended) values (?, ?, ?, ?) where session_id == ?'
+    insert_string_two = 'insert into results (question_id, user_id) ' \
+                        'select s.question_id, s.user_id from session s join results r on s.session_id = r.session_id'
+    
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            con.execute(insert_string_one, (points, correct, start, end, session_id, ))
+            con.execute(insert_string_two)
+    except sqlite3.IntegrityError as e:
+        print(f'Error adding items to results table because {e}\n')
+    finally:
+        con.close()"""
+
+def add_results(question_id, points, correct, start, end):
+
+    insert_string = 'insert into results (question_id, points, correct, time_started, time_ended) values (?, ?, ?, ?, ?)'
+
+
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            con.execute(insert_string, (question_id, points, correct, start, end, ))
+    except sqlite3.IntegrityError as e:
+        print(f'Error adding to results table becase {e}\n')
+    finally:
+        con.close()
+
+def show_results():
+
+    select_string = 'select * from results'
+    try:
+        with sqlite3.connect('quiz_data_questions_db.db') as con:
+            res = con.execute(select_string)
+            results = res.fetchall()
+    except sqlite3.IntegrityError as e:
+        print(f'Error showing items in results table because {e}\n')
+    finally:
+        con.close()
+    return results
+
+

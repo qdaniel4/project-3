@@ -52,13 +52,14 @@ def get_question_ids(topic_num):
         with sqlite3.connect('quiz_data_questions_db.db') as con:
             res = con.execute(select_string, (topic_num,))
             question_ids = res.fetchall()
-    except sqlite3.IntegrityError as e:
+    except sqlite3.IntegrityError as e:  # select statements won't raise integrity errors, better to use the general sqlite3 error
+        # same comment on the except blocks used with other select statements. You'll only get integrity errors if you modify the database.
         print(f'Error fetching question ID because of {e}\n')
     finally:
         con.close()
     return question_ids
 
-def get_question_text(question_ids):
+def get_question_text(question_ids):  # if question_ids is one question ID, then the parameter name should be question_id
 
     select_string = 'select question_text from questions where question_id = ?'
     q_text_list = []
@@ -69,7 +70,7 @@ def get_question_text(question_ids):
                 res = con.execute(select_string, question_ids[q_text])
                 question_text = res.fetchone()
                 q_text_list.append(question_text)
-    except sqlite3.IntegrityError as e:
+    except sqlite3.IntegrityError as e: 
         print(f'Error fetching question text because of {e}\n')
     finally:
         con.close()
@@ -86,7 +87,7 @@ def get_points_for_question(question_ids):
                 res = con.execute(select_string, question_ids[points])
                 q_points = res.fetchone()
                 q_point_list.append(q_points)
-    except sqlite3.IntegrityError as e:
+    except sqlite3.IntegrityError as e:  
         print(f'Error fetching question points because of {e}\n')
     finally:
         con.close()
@@ -180,7 +181,7 @@ def add_results(question_id, points, correct, start, end):
     finally:
         con.close()
 
-def show_results():
+def show_results():   # this doesn't show anything - would get_results be a better name? 
 
     select_string = 'select * from results'
     try:
